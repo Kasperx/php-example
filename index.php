@@ -27,7 +27,6 @@
 			// 	}
 			// }
 			// load class file
-			require_once('SQLiteConnection.php');
 			require_once 'vendor/autoload.php';
 
 			// website
@@ -116,7 +115,7 @@
 				echo '</tr>';
 				// end html code
 				$array = array();
-				for($count=0; $count<SQLiteConnection::countOfDataPerTable; $count++)
+				for($count=0; $count<10; $count++)
 				{
 					$faker = Faker\Factory::create();
 					// $person = new person($faker->firstName, $faker->lastName, $count*10, rand());
@@ -134,53 +133,7 @@
 					echo "<td>".$array[$count]->get_city()."</td>";
 					echo '</tr>';
 				}
-				// end html code
-				echo '</table>';
-			}
-			function getDataFromDB()
-			{
-				// begin html code
-				echo "<br><h1>src: db (".SQLite3::version()[versionString].")</h1>";
-				echo '<table class="table">';
 				echo '<tr>';
-				echo '<th scope="col">1st name</th>';
-				echo '<th scope="col">last name</th>';
-				echo '<th scope="col">age</th>';
-				echo '<th scope="col">pw</th>';
-				echo '<th scope="col">city</th>';
-				echo '</tr>';
-				// end html code
-				// db connection. -> sqlite
-				$pdo = new SQLiteConnection();
-				$pdo_connect = $pdo->connect();
-				insertData($pdo);
-				if ($pdo != null)
-				{
-					// echo 'Connected to the SQLite database successfully!';
-					// $pdo->insertData();
-					// (new SQLiteConnection())->insertData();
-					// $pdo->getdata();
-					$sql = ''
-					. 'select '
-					. 'firstname, '
-					. 'lastname, '
-					. 'age, '
-					. 'pw, '
-					. 'city '
-					. 'from person';
-					$results = $pdo->query($sql);
-					// echo("<br>".$sql);
-					while($row = $results->fetchArray(SQLITE3_ASSOC)){
-						echo '<tr>';
-						echo "<td>$row[firstname]</td>";
-						echo "<td>$row[lastname]</td>";
-						echo "<td>$row[age]</td>";
-						echo "<td>$row[pw]</td>";
-						echo "<td>$row[city]</td>";
-						// echo "<td>".makeRandomString()."</td>";
-						echo '</tr>';
-					}
-					echo '<tr>';
 					echo "<td>"
 					.'<input placeholder="Put some shit here">'
 					.'<br>'
@@ -207,62 +160,8 @@
 					.'<div style="font-size:12px;">No effect so far :(</div>'
 					."</td>";
 					echo '</tr>';
-				}
-				else
-				{
-					echo("<br>".'Whoops, could not connect to the SQLite database!');
-				}
 				// end html code
 				echo '</table>';
-			}
-			// function getDataRandom()
-			// {
-			// 	// get random data with library
-			// 	for($count=0; $count<10; $count++)
-			// 	{
-			// 		$faker = Faker\Factory::create();
-			// 		echo '<tr>';
-			// 		echo "<td>".$faker->firstName."</td>";
-			// 		echo "<td>".$faker->lastName."</td>";
-			// 		echo "<td>".rand()."</td>";
-			// 		echo "<td>".makeRandomString()."</td>";
-			// 		echo '</tr>';
-			// 	}
-			// }
-			function insertData($pdo)
-			{
-				// create?
-				// $stmt = $pdo->prepare('drop table if exists person;');
-				// $stmt->execute();
-				// $stmt = $pdo->prepare('create table if not exists person '
-				// .'(id integer primary key autoincrement, '
-				// .'firstname text unique, '
-				// .'lastname text, '
-				// .'age integer, '
-				// .'pw text, '
-				// .'city text);');
-				// $stmt->execute();
-				// or just remove
-				$stmt = $pdo->prepare('delete from person');
-				$stmt->execute();
-				for($count=0; $count<SQLiteConnection::countOfDataPerTable; $count++)
-				{
-					$faker = Faker\Factory::create();
-					$sql = 'INSERT INTO person ('
-					.'firstname, lastname, age, pw, city'
-					.') VALUES ('
-					."'".$faker->firstName."', '".$faker->firstName."', ".(rand(0, 100)).", '".getRandomString()."', '".$faker->state."'"
-					.')'
-					.'';
-					// $stmt = $this->pdo->prepare($sql);
-					// echo '<br>'.$sql;
-					$stmt = $pdo->prepare($sql);
-					// $stmt->bindValue(':project_name', $projectName);
-					$stmt->execute();
-				}
-
-				// return $this->pdo->lastInsertId();
-				// return $pdo->lastInsertId();
 			}
 		?>
 	</table>
