@@ -1,6 +1,6 @@
 <html>
  <head>
-   <title>Hello World</title>
+   <title>Get some data</title>
    <script
    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
@@ -36,20 +36,36 @@
 				private $name;
 				private $surname;
 				private $age;
+				private $pw;
 
-				public function __construct(string $name, string $surname, int $age){
+				// public function __construct(string $name, string $surname, int $age)
+				// {
+				// 	$this->name = $name;
+				// 	$this->surname = $surname;
+				// 	$this->age = $age;
+				// }
+				public function __construct(string $name, string $surname, int $age, string $pw)
+				{
 					$this->name = $name;
 					$this->surname = $surname;
 					$this->age = $age;
+					$this->pw = $pw;
 				}
-				public function get_name(){
+				public function get_name()
+				{
 					return $this->name;
 				}
-				public function get_surname(){
+				public function get_surname()
+				{
 					return $this->surname;
 				}
-				public function get_age(){
+				public function get_age()
+				{
 					return $this->age;
+				}
+				public function get_pw()
+				{
+					return $this->pw;
 				}
 			}
 			
@@ -89,19 +105,36 @@
 			// get data
 			function getDataIntern()
 			{
-				$person1 = new person('achim', 'bounty', 45);
-				$person2 = new person('paula', 'ursula', 30);
+				$array = [];
+				for($count=0; $count<10; $count++)
+				{
+					$faker = Faker\Factory::create();
+					$person = new person($faker->firstName, $faker->lastName, $count*10, rand());
+					array_push($array, $person);
+				}
+				for($count=0; $count<10; $count++)
+				{
+					echo '<tr>';
+					echo "<td>".$array[$count]->get_name()."</td>";
+					echo "<td>".$array[$count]->get_surname()."</td>";
+					echo "<td>".$array[$count]->get_age()."</td>";
+					echo "<td>".$array[$count]->get_pw()."</td>";
+					echo '</tr>';
+				}
+				// not really object-orientating :(
+				// $person1 = new person('achim', 'bounty', 45);
+				// $person2 = new person('paula', 'ursula', 30);
 				// get data from own class
-				echo '<tr>';
-				echo "<td>".$person1->get_name()."</td>";
-				echo "<td>".$person1->get_surname()."</td>";
-				echo "<td>".$person1->get_age()."</td>";
-				echo '</tr>';
-				echo '<tr>';
-				echo "<td>".$person2->get_name()."</td>";
-				echo "<td>".$person2->get_surname()."</td>";
-				echo "<td>".$person2->get_age()."</td>";
-				echo '</tr>';
+				// echo '<tr>';
+				// echo "<td>".$person1->get_name()."</td>";
+				// echo "<td>".$person1->get_surname()."</td>";
+				// echo "<td>".$person1->get_age()."</td>";
+				// echo '</tr>';
+				// echo '<tr>';
+				// echo "<td>".$person2->get_name()."</td>";
+				// echo "<td>".$person2->get_surname()."</td>";
+				// echo "<td>".$person2->get_age()."</td>";
+				// echo '</tr>';
 				echo '<tr>';
 				echo "<td>-</td>";
 				echo "<td>-</td>";
@@ -114,7 +147,8 @@
 				// db connection. -> sqlite
 				$pdo = new SQLiteConnection();
 				$pdo_connect = $pdo->connect();
-				if ($pdo != null){
+				if ($pdo != null)
+				{
 					// echo 'Connected to the SQLite database successfully!';
 					// $pdo->insertData();
 					// (new SQLiteConnection())->insertData();
@@ -126,7 +160,7 @@
 					. 'age '
 					. 'from person';
 					$results = $pdo->query($sql);
-					echo("<br>".$sql);
+					// echo("<br>".$sql);
 					while($row = $results->fetchArray(SQLITE3_ASSOC)){
 						echo '<tr>';
 						echo "<td>$row[firstname]</td>";
@@ -147,20 +181,20 @@
 				echo "<td>-</td>";
 				echo '</tr>';
 			}
-			function getDataRandom()
-			{
-				// get random data with library
-				for($count=0; $count<10; $count++)
-				{
-					$faker = Faker\Factory::create();
-					echo '<tr>';
-					echo "<td>".$faker->firstName."</td>";
-					echo "<td>".$faker->lastName."</td>";
-					echo "<td>".rand()."</td>";
-					echo "<td>".makeRandomString()."</td>";
-					echo '</tr>';
-				}
-			}
+			// function getDataRandom()
+			// {
+			// 	// get random data with library
+			// 	for($count=0; $count<10; $count++)
+			// 	{
+			// 		$faker = Faker\Factory::create();
+			// 		echo '<tr>';
+			// 		echo "<td>".$faker->firstName."</td>";
+			// 		echo "<td>".$faker->lastName."</td>";
+			// 		echo "<td>".rand()."</td>";
+			// 		echo "<td>".makeRandomString()."</td>";
+			// 		echo '</tr>';
+			// 	}
+			// }
 		?>
 	</table>
 </body>
