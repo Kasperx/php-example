@@ -8,6 +8,7 @@
 class SQLiteConnection extends SQLite3{
     
     const PATH_TO_SQLITE_FILE = 'database.db';
+    const countOfDataPerTable = 10;
 
     private $pdo;
     private $db;

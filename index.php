@@ -30,6 +30,17 @@
 			require_once('SQLiteConnection.php');
 			require_once 'vendor/autoload.php';
 
+			// website
+
+			// main routine, get db connection
+			getDataIntern();
+			getDataFromDB();
+			// getDataRandom();
+			// end html code
+			echo '</table>';
+
+			// data
+
 			// build own structure
 			class person
 			{
@@ -37,6 +48,7 @@
 				private $surname;
 				private $age;
 				private $pw;
+				private $city;
 
 				// public function __construct(string $name, string $surname, int $age)
 				// {
@@ -44,12 +56,13 @@
 				// 	$this->surname = $surname;
 				// 	$this->age = $age;
 				// }
-				public function __construct(string $name, string $surname, int $age, string $pw)
+				public function __construct(string $name, string $surname, int $age, string $pw, string $city)
 				{
 					$this->name = $name;
 					$this->surname = $surname;
 					$this->age = $age;
 					$this->pw = $pw;
+					$this->city = $city;
 				}
 				public function get_name()
 				{
@@ -67,28 +80,14 @@
 				{
 					return $this->pw;
 				}
+				public function get_city()
+				{
+					return $this->city;
+				}
 			}
 			
-			echo '<table class="table">';
-			echo '<tr>';
-			echo '<th scope="col">1st name</th>';
-			echo '<th scope="col">last name</th>';
-			echo '<th scope="col">age</th>';
-			echo '<th scope="col">pw</th>';
-			echo '</tr>';
-			
-			// main routine, get db connection
-			getDataIntern();
-			getDataFromDB();
-			getDataRandom();
-			
-			// end html code
-			echo '</table>';
-			echo '</div>';
-			echo '</body>';
-
 			// get random string
-			function makeRandomString($max=6)
+			function getRandomString($max=6)
 			{
 				// $i = 0;
 				// $possible_keys = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -105,48 +104,56 @@
 			// get data
 			function getDataIntern()
 			{
-				$array = [];
-				for($count=0; $count<10; $count++)
+				// begin html code
+				echo "<br><h1>src: internal class</h1>";
+				echo '<table class="table">';
+				echo '<tr>';
+				echo '<th scope="col">1st name</th>';
+				echo '<th scope="col">last name</th>';
+				echo '<th scope="col">age</th>';
+				echo '<th scope="col">pw</th>';
+				echo '<th scope="col">city</th>';
+				echo '</tr>';
+				// end html code
+				$array = array();
+				for($count=0; $count<SQLiteConnection::countOfDataPerTable; $count++)
 				{
 					$faker = Faker\Factory::create();
-					$person = new person($faker->firstName, $faker->lastName, $count*10, rand());
+					// $person = new person($faker->firstName, $faker->lastName, $count*10, rand());
+					$person = new person($faker->firstName, $faker->lastName, rand(0, 100), getRandomString(), $faker->state);
 					array_push($array, $person);
 				}
-				for($count=0; $count<10; $count++)
+				// for($count=0; $count<SQLiteConnection::countOfDataPerTable; $count++)
+				for($count=0; $count<sizeof($array); $count++)
 				{
 					echo '<tr>';
 					echo "<td>".$array[$count]->get_name()."</td>";
 					echo "<td>".$array[$count]->get_surname()."</td>";
 					echo "<td>".$array[$count]->get_age()."</td>";
 					echo "<td>".$array[$count]->get_pw()."</td>";
+					echo "<td>".$array[$count]->get_city()."</td>";
 					echo '</tr>';
 				}
-				// not really object-orientating :(
-				// $person1 = new person('achim', 'bounty', 45);
-				// $person2 = new person('paula', 'ursula', 30);
-				// get data from own class
-				// echo '<tr>';
-				// echo "<td>".$person1->get_name()."</td>";
-				// echo "<td>".$person1->get_surname()."</td>";
-				// echo "<td>".$person1->get_age()."</td>";
-				// echo '</tr>';
-				// echo '<tr>';
-				// echo "<td>".$person2->get_name()."</td>";
-				// echo "<td>".$person2->get_surname()."</td>";
-				// echo "<td>".$person2->get_age()."</td>";
-				// echo '</tr>';
-				echo '<tr>';
-				echo "<td>-</td>";
-				echo "<td>-</td>";
-				echo "<td>-</td>";
-				echo "<td>-</td>";
-				echo '</tr>';
+				// end html code
+				echo '</table>';
 			}
 			function getDataFromDB()
 			{
+				// begin html code
+				echo "<br><h1>src: db (".SQLite3::version()[versionString].")</h1>";
+				echo '<table class="table">';
+				echo '<tr>';
+				echo '<th scope="col">1st name</th>';
+				echo '<th scope="col">last name</th>';
+				echo '<th scope="col">age</th>';
+				echo '<th scope="col">pw</th>';
+				echo '<th scope="col">city</th>';
+				echo '</tr>';
+				// end html code
 				// db connection. -> sqlite
 				$pdo = new SQLiteConnection();
 				$pdo_connect = $pdo->connect();
+				insertData($pdo);
 				if ($pdo != null)
 				{
 					// echo 'Connected to the SQLite database successfully!';
@@ -157,7 +164,9 @@
 					. 'select '
 					. 'firstname, '
 					. 'lastname, '
-					. 'age '
+					. 'age, '
+					. 'pw, '
+					. 'city '
 					. 'from person';
 					$results = $pdo->query($sql);
 					// echo("<br>".$sql);
@@ -166,20 +175,45 @@
 						echo "<td>$row[firstname]</td>";
 						echo "<td>$row[lastname]</td>";
 						echo "<td>$row[age]</td>";
-						echo "<td>".makeRandomString()."</td>";
+						echo "<td>$row[pw]</td>";
+						echo "<td>$row[city]</td>";
+						// echo "<td>".makeRandomString()."</td>";
 						echo '</tr>';
 					}
+					echo '<tr>';
+					echo "<td>"
+					.'<input placeholder="Put some shit here">'
+					.'<br>'
+					.'<div style="font-size:12px;">No effect so far :(</div>'
+					."</td>";
+					echo "<td>"
+					.'<input placeholder="Put some shit here">'
+					.'<br>'
+					.'<div style="font-size:12px;">No effect so far :(</div>'
+					."</td>";
+					echo "<td>"
+					.'<input placeholder="Put some shit here">'
+					.'<br>'
+					.'<div style="font-size:12px;">No effect so far :(</div>'
+					."</td>";
+					echo "<td>"
+					.'<input placeholder="Put some shit here">'
+					.'<br>'
+					.'<div style="font-size:12px;">No effect so far :(</div>'
+					."</td>";
+					echo "<td>"
+					.'<input placeholder="Put some shit here">'
+					.'<br>'
+					.'<div style="font-size:12px;">No effect so far :(</div>'
+					."</td>";
+					echo '</tr>';
 				}
 				else
 				{
 					echo("<br>".'Whoops, could not connect to the SQLite database!');
 				}
-				echo '<tr>';
-				echo "<td>-</td>";
-				echo "<td>-</td>";
-				echo "<td>-</td>";
-				echo "<td>-</td>";
-				echo '</tr>';
+				// end html code
+				echo '</table>';
 			}
 			// function getDataRandom()
 			// {
@@ -195,7 +229,44 @@
 			// 		echo '</tr>';
 			// 	}
 			// }
+			function insertData($pdo)
+			{
+				// create?
+				// $stmt = $pdo->prepare('drop table if exists person;');
+				// $stmt->execute();
+				// $stmt = $pdo->prepare('create table if not exists person '
+				// .'(id integer primary key autoincrement, '
+				// .'firstname text unique, '
+				// .'lastname text, '
+				// .'age integer, '
+				// .'pw text, '
+				// .'city text);');
+				// $stmt->execute();
+				// or just remove
+				$stmt = $pdo->prepare('delete from person');
+				$stmt->execute();
+				for($count=0; $count<SQLiteConnection::countOfDataPerTable; $count++)
+				{
+					$faker = Faker\Factory::create();
+					$sql = 'INSERT INTO person ('
+					.'firstname, lastname, age, pw, city'
+					.') VALUES ('
+					."'".$faker->firstName."', '".$faker->firstName."', ".(rand(0, 100)).", '".getRandomString()."', '".$faker->state."'"
+					.')'
+					.'';
+					// $stmt = $this->pdo->prepare($sql);
+					// echo '<br>'.$sql;
+					$stmt = $pdo->prepare($sql);
+					// $stmt->bindValue(':project_name', $projectName);
+					$stmt->execute();
+				}
+
+				// return $this->pdo->lastInsertId();
+				// return $pdo->lastInsertId();
+			}
 		?>
 	</table>
+	</div>
+	</body>
 </body>
 </html>
