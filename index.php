@@ -1,5 +1,5 @@
 <html>
- <head>
+<head>
    <title>Get some data</title>
    <script
    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -10,8 +10,10 @@
    rel="stylesheet"
    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
    crossorigin="anonymous">
+   <link href="style.css" rel="stylesheet">
  	</head>
- 	<body>
+ 	<!-- <body style="background-color:#ffcccc"> -->
+ 	<body style="background-color:#2E2E2E; color:#81BEF7;">
 		<div class="container">
 		<?php
 
@@ -87,7 +89,7 @@
 			}
 			
 			// get random string
-			function getRandomString($max=6)
+			function getRandomString()
 			{
 				// $i = 0;
 				// $possible_keys = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -104,15 +106,26 @@
 			// get data
 			function getDataIntern()
 			{
+				$drawWithColor = true;
+				$color = '#81BEF7';
 				// begin html code
 				echo "<br><h1>src: internal class</h1>";
 				echo '<table class="table">';
 				echo '<tr>';
-				echo '<th scope="col">1st name</th>';
-				echo '<th scope="col">last name</th>';
-				echo '<th scope="col">age</th>';
-				echo '<th scope="col">pw</th>';
-				echo '<th scope="col">city</th>';
+				if($drawWithColor)
+				{
+					echo '<th style="color: '.$color.';">1st name</th>';
+					echo '<th style="color: '.$color.';">last name</th>';
+					echo '<th style="color: '.$color.';">age</th>';
+					echo '<th style="color: '.$color.';">pw</th>';
+					echo '<th style="color: '.$color.';">city</th>';
+				} else {
+					echo '<th>1st name</th>';
+					echo '<th>last name</th>';
+					echo '<th>age</th>';
+					echo '<th>pw</th>';
+					echo '<th>city</th>';
+				}
 				echo '</tr>';
 				// end html code
 				$array = array();
@@ -123,16 +136,29 @@
 					$person = new person($faker->firstName, $faker->lastName, rand(0, 100), getRandomString(), $faker->state);
 					array_push($array, $person);
 				}
-				// for($count=0; $count<SQLiteConnection::countOfDataPerTable; $count++)
-				for($count=0; $count<sizeof($array); $count++)
+				if($drawWithColor)
 				{
-					echo '<tr>';
-					echo "<td>".$array[$count]->get_name()."</td>";
-					echo "<td>".$array[$count]->get_surname()."</td>";
-					echo "<td>".$array[$count]->get_age()."</td>";
-					echo "<td>".$array[$count]->get_pw()."</td>";
-					echo "<td>".$array[$count]->get_city()."</td>";
-					echo '</tr>';
+					for($count=0; $count<sizeof($array); $count++)
+					{
+						echo '<tr>';
+						echo '<td style="color: '.$color.';">'.$array[$count]->get_name().'</td>';
+						echo '<td style="color: '.$color.';">'.$array[$count]->get_surname().'</td>';
+						echo '<td style="color: '.$color.';">'.$array[$count]->get_age().'</td>';
+						echo '<td style="color: '.$color.';">'.$array[$count]->get_pw().'</td>';
+						echo '<td style="color: '.$color.';">'.$array[$count]->get_city().'</td>';
+						echo '</tr>';
+					}
+				} else {
+					for($count=0; $count<sizeof($array); $count++)
+					{
+						echo '<tr>';
+						echo '<td>'.$array[$count]->get_name().'</td>';
+						echo '<td>'.$array[$count]->get_surname().'</td>';
+						echo '<td>'.$array[$count]->get_age().'</td>';
+						echo '<td>'.$array[$count]->get_pw().'</td>';
+						echo '<td>'.$array[$count]->get_city().'</td>';
+						echo '</tr>';
+					}
 				}
 				// end html code
 				echo '</table>';
@@ -140,20 +166,32 @@
 			function getDataFromDB()
 			{
 				// begin html code
-				echo "<br><h1>src: db (".SQLite3::version()[versionString].")</h1>";
+				echo "<br><h1>src: db (sqlite v".SQLite3::version()[versionString].")</h1>";
 				echo '<table class="table">';
 				echo '<tr>';
-				echo '<th scope="col">1st name</th>';
-				echo '<th scope="col">last name</th>';
-				echo '<th scope="col">age</th>';
-				echo '<th scope="col">pw</th>';
-				echo '<th scope="col">city</th>';
+				$drawWithColor = true;
+				$color = '#81BEF7';
+				if($drawWithColor){
+					echo '<th style="color: '.$color.';">1st name</th>';
+					echo '<th style="color: '.$color.';">last name</th>';
+					echo '<th style="color: '.$color.';">age</th>';
+					echo '<th style="color: '.$color.';">pw</th>';
+					echo '<th style="color: '.$color.';">city</th>';
+				} else {
+					echo '<th>1st name</th>';
+					echo '<th>last name</th>';
+					echo '<th>age</th>';
+					echo '<th>pw</th>';
+					echo '<th>city</th>';
+				}
 				echo '</tr>';
 				// end html code
 				// db connection. -> sqlite
 				$pdo = new SQLiteConnection();
 				$pdo_connect = $pdo->connect();
-				insertData($pdo);
+				if(SQLiteConnection::inputNewData){
+					insertData($pdo);
+				}
 				if ($pdo != null)
 				{
 					// echo 'Connected to the SQLite database successfully!';
@@ -170,41 +208,57 @@
 					. 'from person';
 					$results = $pdo->query($sql);
 					// echo("<br>".$sql);
-					while($row = $results->fetchArray(SQLITE3_ASSOC)){
-						echo '<tr>';
-						echo "<td>$row[firstname]</td>";
-						echo "<td>$row[lastname]</td>";
-						echo "<td>$row[age]</td>";
-						echo "<td>$row[pw]</td>";
-						echo "<td>$row[city]</td>";
-						// echo "<td>".makeRandomString()."</td>";
-						echo '</tr>';
+					if($drawWithColor)
+					{
+						while($row = $results->fetchArray(SQLITE3_ASSOC))
+						{
+							echo '<tr>';
+							echo '<td style="color: '.$color.';">'.$row[firstname].'</td>';
+							echo '<td style="color: '.$color.';">'.$row[lastname].'</td>';
+							echo '<td style="color: '.$color.';">'.$row[age].'</td>';
+							echo '<td style="color: '.$color.';">'.$row[pw].'</td>';
+							echo '<td style="color: '.$color.';">'.$row[city].'</td>';
+							echo '</tr>';
+						}
+					} else {
+						while($row = $results->fetchArray(SQLITE3_ASSOC))
+						{
+							echo '<tr>';
+							echo '<td>$row[firstname]</td>';
+							echo '<td>$row[lastname]</td>';
+							echo '<td>$row[age]</td>';
+							echo '<td>$row[pw]</td>';
+							echo '<td>$row[city]</td>';
+							echo '</tr>';
+						}
 					}
+					$textInput = 'Put some shit here';
+					$textInfo = 'No effect so far :(';
 					echo '<tr>';
 					echo "<td>"
-					.'<input placeholder="Put some shit here">'
+					.'<input placeholder="'.$textInput.'">'
 					.'<br>'
-					.'<div style="font-size:12px;">No effect so far :(</div>'
+					.'<div style="font-size:12px;">'.$textInfo.'</div>'
 					."</td>";
 					echo "<td>"
-					.'<input placeholder="Put some shit here">'
+					.'<input placeholder="'.$textInput.'">'
 					.'<br>'
-					.'<div style="font-size:12px;">No effect so far :(</div>'
+					.'<div style="font-size:12px;">'.$textInfo.'</div>'
 					."</td>";
 					echo "<td>"
-					.'<input placeholder="Put some shit here">'
+					.'<input placeholder="'.$textInput.'">'
 					.'<br>'
-					.'<div style="font-size:12px;">No effect so far :(</div>'
+					.'<div style="font-size:12px;">'.$textInfo.'</div>'
 					."</td>";
 					echo "<td>"
-					.'<input placeholder="Put some shit here">'
+					.'<input placeholder="'.$textInput.'">'
 					.'<br>'
-					.'<div style="font-size:12px;">No effect so far :(</div>'
+					.'<div style="font-size:12px;">'.$textInfo.'</div>'
 					."</td>";
 					echo "<td>"
-					.'<input placeholder="Put some shit here">'
+					.'<input placeholder="'.$textInput.'">'
 					.'<br>'
-					.'<div style="font-size:12px;">No effect so far :(</div>'
+					.'<div style="font-size:12px;">'.$textInfo.'</div>'
 					."</td>";
 					echo '</tr>';
 				}
