@@ -232,7 +232,7 @@
 							echo '</tr>';
 						}
 					}
-					$textInput = 'Put some shit here';
+					$textInput = 'Input some text here';
 					$textInfo = 'No effect so far :(';
 					echo '<tr>';
 					echo "<td>"
